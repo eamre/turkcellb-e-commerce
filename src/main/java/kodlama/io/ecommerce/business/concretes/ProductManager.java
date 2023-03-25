@@ -16,29 +16,30 @@ public class ProductManager implements ProductService {
 
     @Override
     public List<Product> getAll() {
-        return productRepository.getAll();
+        return productRepository.findAll();
     }
 
     @Override
     public Product getById(int id) {
-        return productRepository.getById(id);
+        return productRepository.findById(id).orElseThrow();
     }
 
     @Override
     public Product add(Product product) {
         validateProduct(product);
-        return productRepository.add(product);
+        return productRepository.save(product);
     }
 
     @Override
     public void delete(int id) {
-        productRepository.delete(id);
+        productRepository.deleteById(id);
     }
 
     @Override
     public Product update(int id,Product product) {
         validateProduct(product);
-        return productRepository.update(id,product);
+        product.setId(id);
+        return productRepository.save(product);
 
     }
 
