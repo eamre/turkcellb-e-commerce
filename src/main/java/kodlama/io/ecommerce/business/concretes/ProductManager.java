@@ -17,7 +17,6 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,8 +28,6 @@ public class ProductManager implements ProductService {
     private final CategoryManager categoryService;
     private final ModelMapper mapper;
     private final ProductBusinessRules rules;
-//    @PersistenceContext
-//    private EntityManager entityManager;
 
     @Override
     public List<GetAllProductsResponse> getAll(boolean showInactive) {
@@ -55,19 +52,18 @@ public class ProductManager implements ProductService {
         response.setCategoryNames(product.getCategories().stream().map(category -> category.getName()).toList());
         return response;
     }
-    //entityManager.find(Category.class, categoryId);
-    //entityManager.merge(category);
+
     @Override
     public CreateProductResponse add(CreateProductRequest request) {
         Product product = mapper.map(request, Product.class);
         product.setId(0);
 
-        List<String> categoryNames = setCategoryForProduct(request.getCategoryIds(), product);
+        List<Integer> categoryIds = setCategoryForProduct(request.getCategoryIds(), product);
 
         repository.save(product);
 
         CreateProductResponse response = mapper.map(product,CreateProductResponse.class);
-        response.setCategoryNames(categoryNames);
+        response.setCategoryIds(categoryIds);
 
         return response;
     }
@@ -76,14 +72,12 @@ public class ProductManager implements ProductService {
         rules.checkIfProductExists(id);
         Product product = mapper.map(request, Product.class);
         product.setId(id);
-//        List<Integer> categoryIdl = request.getCategoryIds();
-//        setCategoryForProduct(categoryIdl, product);
-        List<String> categoryNames = setCategoryForProduct(request.getCategoryIds(), product);
+        List<Integer> categoryIds = setCategoryForProduct(request.getCategoryIds(), product);
 
         repository.save(product);
 
         UpdateProductResponse response = mapper.map(product,UpdateProductResponse.class);
-        response.setCategoryNames(categoryNames);
+        response.setCategoryIds(categoryIds);
 
         return response;
     }
@@ -103,55 +97,23 @@ public class ProductManager implements ProductService {
     public void processSaleProduct(CreateSaleRequest request){
         Product product = repository.findById(request.getProductId()).orElseThrow();
 
-        product.setQuantity(product.getQuantity()- request.getQuantity());
+        product.setQuantity(product.getQuantity() - request.getQuantity());
         repository.save(product);
     }
 
-    private List<String> setCategoryForProduct(List<Integer> categoryIdl, Product product) {
-        List<String> categoryNames = new ArrayList<>();
+    private List<Integer> setCategoryForProduct(List<Integer> categoryIds, Product product) {
         Set<Category> categories = new HashSet<>();
-        for (int categoryId : categoryIdl) {
+        for (int categoryId : categoryIds) {
             GetCategoryResponse categoryResponse = categoryService.getById(categoryId);
             Category category = mapper.map(categoryResponse, Category.class);
             categories.add(category);
-            categoryNames.add(category.getName());
         }
         product.setCategories(categories);
-        return categoryNames;
-//        List<Integer> categoryIds = categories
-//                .stream()
-//                .map(category -> category.getId())
-//                .toList();
-//        return categoryIds;
+        List<Integer> categoryList = categories
+                .stream()
+                .map(category -> category.getId())
+                .toList();
+        return categoryList;
     }
 
-    //! Business rules
-    private void validateProduct(Product product) {
-       // checkIfUnitPriceValid(product);
-        checkIfQuantityValid(product);
-        checkIfDescriptionLengthValid(product);
-    }
-
-    private void checkIfUnitPriceValid(CreateProductRequest request) {
-        if (request.getPrice() <= 0)
-            throw new IllegalArgumentException("Price cannot be less than or equal to zero.");
-    }
-
-    private void checkIfQuantityValid(Product product) {
-        if (product.getQuantity() < 0) throw new IllegalArgumentException("Quantity cannot be less than zero.");
-    }
-
-    private void checkIfDescriptionLengthValid(Product product) {
-        if (product.getDescription().length() < 10 || product.getDescription().length() > 50)
-            throw new IllegalArgumentException("Description length must be between 10 and 50 characters.");
-    }
 }
-//if (product.getPrice()<=0){
-//        throw new RuntimeException("ürünün fiyatı sıfırdan küçük olamaz ");
-//        }
-//        if(product.getQuantity()<0){
-//        throw new RuntimeException("ürünün miktarı sıfırdan küçük olamaz ");
-//        }
-//        if(!(product.getDescription().length() >= 10 && product.getDescription().length() <= 50)){
-//        throw new RuntimeException("ürünün açıklama kısmı 10 ile 50 karakter arasında olmalı ");
-//        }

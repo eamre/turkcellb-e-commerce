@@ -1,11 +1,9 @@
 package kodlama.io.ecommerce.business.concretes;
 
-import kodlama.io.ecommerce.business.abstracts.InvoiceService;
-import kodlama.io.ecommerce.business.abstracts.PaymentService;
-import kodlama.io.ecommerce.business.abstracts.ProductService;
-import kodlama.io.ecommerce.business.abstracts.SaleService;
+import kodlama.io.ecommerce.business.abstracts.*;
 import kodlama.io.ecommerce.business.dto.requests.create.CreateInvoiceRequest;
 import kodlama.io.ecommerce.business.dto.requests.create.CreateSaleRequest;
+import kodlama.io.ecommerce.business.dto.requests.create.CreateShippingRequest;
 import kodlama.io.ecommerce.business.dto.requests.update.UpdateSaleRequest;
 import kodlama.io.ecommerce.business.dto.responses.create.CreateSaleResponse;
 import kodlama.io.ecommerce.business.dto.responses.get.GetAllSalesResponse;
@@ -29,6 +27,7 @@ public class SaleManager implements SaleService {
     private final ProductService productService;
     private final PaymentService paymentService;
     private final InvoiceService invoiceService;
+    private final ShippingService shippingService;
     private final SaleBusinessRules rules;
     private final ModelMapper mapper;
     @Override
@@ -73,6 +72,10 @@ public class SaleManager implements SaleService {
         createInvoice(request, product, sale, invoiceRequest);
         invoiceService.add(invoiceRequest);
 
+        CreateShippingRequest createShippingRequest = new CreateShippingRequest();
+        createShipping(request,createShippingRequest,sale);
+        shippingService.add(createShippingRequest);
+
         CreateSaleResponse response = mapper.map(sale,CreateSaleResponse.class);
         return response;
     }
@@ -106,6 +109,12 @@ public class SaleManager implements SaleService {
         invoiceRequest.setPrice(request.getPrice());
         invoiceRequest.setProductName(product.getName());
         invoiceRequest.setSaleDate(sale.getSaleDate());
+    }
+
+    private void createShipping(CreateSaleRequest saleRequest, CreateShippingRequest shippingRequest, Sale sale){
+        shippingRequest.setAddress(saleRequest.getShippingRequest().getAddress());
+        shippingRequest.setFullName(saleRequest.getShippingRequest().getFullName());
+        shippingRequest.setSaleId(sale.getId());
     }
 
 }

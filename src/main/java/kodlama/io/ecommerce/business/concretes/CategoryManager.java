@@ -1,7 +1,5 @@
 package kodlama.io.ecommerce.business.concretes;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import kodlama.io.ecommerce.business.abstracts.CategoryService;
 import kodlama.io.ecommerce.business.dto.requests.create.CreateCategoryRequest;
 import kodlama.io.ecommerce.business.dto.requests.update.UpdateCategoryRequest;
@@ -24,8 +22,7 @@ public class CategoryManager implements CategoryService {
     private final CategoryRepository repository;
     private final ModelMapper mapper;
     private final CategoryBusinessRules rules;
-    @PersistenceContext
-    private EntityManager entityManager;
+
     @Override
     public List<GetAllCategoriesResponse> getAll() {
         List<Category> categories = repository.findAll();
@@ -68,12 +65,6 @@ public class CategoryManager implements CategoryService {
 
     @Override
     public void delete(int id) {
-//        Category category = entityManager.find(Category.class, id);
-//        Set<Product> products = category.getProducts();
-//        for (Product product : products) {
-//            // Üründen kategoriyi çıkar
-//            product.getCategories().remove(category);
-//        }
         rules.checkIfCategoryExists(id);
         repository.deleteById(id);
     }

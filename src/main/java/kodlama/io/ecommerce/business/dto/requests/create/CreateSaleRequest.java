@@ -15,6 +15,7 @@ public class CreateSaleRequest {
     private double price;
     private int quantity;
 
+    private CreateShippingRequest shippingRequest;
     private PaymentRequest paymentRequest;
 
 }

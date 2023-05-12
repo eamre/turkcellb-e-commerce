@@ -5,19 +5,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
+import java.time.LocalDate;
 @AllArgsConstructor
 @Getter
 @Setter
 @NoArgsConstructor
-public class UpdateProductResponse {
+public class UpdateShippingResponse {
     private int id;
-    private String name;
-    private int quantity;
-    private double price;
-    private boolean isActive;
-    private String description;
-    private List<Integer> categoryIds;
 
+    private int saleId;
+
+    private String shippingCode;
+
+    private LocalDate shippingDate;
+
+    private String fullName;
+
+    private String address;
 }
