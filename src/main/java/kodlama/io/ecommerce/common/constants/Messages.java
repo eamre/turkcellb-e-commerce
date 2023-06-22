@@ -16,6 +16,11 @@ public class Messages {
         public static final String AlreadyExists = "SALE_ALREADY_EXISTS";
     }
 
+    public static class Cart {
+        public static final String NotExists = "CART_NOT_EXISTS";
+        public static final String AlreadyExists = "CART_ALREADY_EXISTS";
+    }
+
     public static class Payment{
         public static final String NotFound = "PAYMENT_NOT_FOUND";
         public static final String CardNumberAlreadyExists = "CARD_NUMBER_ALREADY_EXISTS";

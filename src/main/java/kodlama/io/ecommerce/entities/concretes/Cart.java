@@ -6,23 +6,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
+@AllArgsConstructor
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-
 @Entity
-@Table(name="invoices")
-public class Invoice {
+@Table(name="carts")
+public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String cardHolder;
+
     private double totalPrice;
-    private LocalDateTime saleDate;
-    @OneToOne
-    @JoinColumn(name = "cart_id")
-    private Cart cart;
+
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
+    private List<CartItem> cartItems;
+
+    @OneToOne(mappedBy = "cart")
+    private Invoice invoice;
 }

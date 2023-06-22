@@ -2,7 +2,6 @@ package kodlama.io.ecommerce.business.concretes;
 
 import kodlama.io.ecommerce.business.abstracts.ProductService;
 import kodlama.io.ecommerce.business.dto.requests.create.CreateProductRequest;
-import kodlama.io.ecommerce.business.dto.requests.create.CreateSaleRequest;
 import kodlama.io.ecommerce.business.dto.requests.update.UpdateProductRequest;
 import kodlama.io.ecommerce.business.dto.responses.create.CreateProductResponse;
 import kodlama.io.ecommerce.business.dto.responses.get.GetAllProductsResponse;
@@ -10,6 +9,8 @@ import kodlama.io.ecommerce.business.dto.responses.get.GetCategoryResponse;
 import kodlama.io.ecommerce.business.dto.responses.get.GetProductResponse;
 import kodlama.io.ecommerce.business.dto.responses.update.UpdateProductResponse;
 import kodlama.io.ecommerce.business.rules.ProductBusinessRules;
+import kodlama.io.ecommerce.entities.concretes.Cart;
+import kodlama.io.ecommerce.entities.concretes.CartItem;
 import kodlama.io.ecommerce.entities.concretes.Category;
 import kodlama.io.ecommerce.entities.concretes.Product;
 import kodlama.io.ecommerce.repository.abstracts.ProductRepository;
@@ -94,11 +95,19 @@ public class ProductManager implements ProductService {
         repository.save(product);
     }
 
-    public void processSaleProduct(CreateSaleRequest request){
-        Product product = repository.findById(request.getProductId()).orElseThrow();
+    public void processSaleProduct(Cart cart){
+        List<CartItem> cartItems = cart.getCartItems();
 
-        product.setQuantity(product.getQuantity() - request.getQuantity());
-        repository.save(product);
+        for (CartItem cartItem : cartItems) {
+            Product product = repository.findById(cartItem.getProduct().getId()).orElseThrow();
+            int quantityCartItem = cartItem.getQuantity();
+            int quantityProduct = product.getQuantity();
+
+            int newQuantity = quantityProduct - quantityCartItem;
+            product.setQuantity(newQuantity);
+
+            repository.save(product);
+        }
     }
 
     private List<Integer> setCategoryForProduct(List<Integer> categoryIds, Product product) {

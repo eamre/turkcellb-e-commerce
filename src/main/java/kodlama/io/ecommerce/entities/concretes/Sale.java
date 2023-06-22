@@ -19,12 +19,15 @@ public class Sale {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private double price;
-    private int quantity;
     private double totalPrice; //readonly
     private LocalDateTime saleDate;
 
-    @ManyToOne
-    @JoinColumn(name="product_id")
-    private Product product;
+    @OneToOne
+    @JoinColumn(name = "cart_id")
+    private Cart cart;
+//    @ManyToMany
+//    @JoinTable(name = "product_sale",
+//            joinColumns = @JoinColumn(name = "sale_id"),
+//            inverseJoinColumns = @JoinColumn(name = "product_id"))
+//    private Set<Product> products;
 }

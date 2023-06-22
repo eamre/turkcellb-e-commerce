@@ -1,4 +1,4 @@
-package kodlama.io.ecommerce.business.dto.requests.create;
+package kodlama.io.ecommerce.business.dto.responses.create;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,12 +11,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CreateInvoiceRequest {
+public class CreateSaleResponseTwo {
+    private int id;
     private int cartId;
-    private String cardHolder;
-//    private String productName;
-//    private double price;
-//    private int quantity;
     private double totalPrice;
     private LocalDateTime saleDate;
 }

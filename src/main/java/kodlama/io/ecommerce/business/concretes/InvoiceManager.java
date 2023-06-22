@@ -1,6 +1,7 @@
 package kodlama.io.ecommerce.business.concretes;
 
 import kodlama.io.ecommerce.business.abstracts.InvoiceService;
+import kodlama.io.ecommerce.common.dto.CartItemResponse;
 import kodlama.io.ecommerce.business.dto.requests.create.CreateInvoiceRequest;
 import kodlama.io.ecommerce.business.dto.requests.update.UpdateInvoiceRequest;
 import kodlama.io.ecommerce.business.dto.responses.create.CreateInvoiceResponse;
@@ -15,6 +16,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 @AllArgsConstructor
 @Service
 public class InvoiceManager implements InvoiceService {
@@ -25,9 +28,9 @@ public class InvoiceManager implements InvoiceService {
     @Override
     public List<GetAllInvoicesResponse> getAll() {
         List<Invoice> invoices = repository.findAll();
-        List<GetAllInvoicesResponse> responses = invoices
-                .stream()
-                .map(invoice -> mapper.map(invoice, GetAllInvoicesResponse.class)).toList();
+        List<GetAllInvoicesResponse> responses = invoices.stream()
+                .map(invoice -> mapToGetAllInvoicesResponse(invoice))
+                .collect(Collectors.toList());
 
         return responses;
     }
@@ -36,7 +39,7 @@ public class InvoiceManager implements InvoiceService {
     public GetInvoiceResponse getById(int id) {
         rules.checkIfInvoiceExists(id);
         Invoice invoice = repository.findById(id).orElseThrow();
-        GetInvoiceResponse response = mapper.map(invoice,GetInvoiceResponse.class);
+        GetInvoiceResponse response = mapToGetInvoiceResponse(invoice);
 
         return response;
     }
@@ -45,7 +48,7 @@ public class InvoiceManager implements InvoiceService {
     public CreateInvoiceResponse add(CreateInvoiceRequest request) {
         Invoice invoice = mapper.map(request, Invoice.class);
         invoice.setId(0);
-        invoice.setTotalPrice(getTotalPrice(invoice));
+        //invoice.setTotalPrice(getTotalPrice(invoice));
         repository.save(invoice);
 
         CreateInvoiceResponse response = mapper.map(invoice,CreateInvoiceResponse.class);
@@ -57,7 +60,7 @@ public class InvoiceManager implements InvoiceService {
         rules.checkIfInvoiceExists(id);
         Invoice invoice = mapper.map(request,Invoice.class);
         invoice.setId(id);
-        invoice.setTotalPrice(getTotalPrice(invoice));
+        //invoice.setTotalPrice(getTotalPrice(invoice));
 
         repository.save(invoice);
         UpdateInvoiceResponse response = mapper.map(invoice,UpdateInvoiceResponse.class);
@@ -70,9 +73,32 @@ public class InvoiceManager implements InvoiceService {
         repository.deleteById(id);
     }
 
+    private GetAllInvoicesResponse mapToGetAllInvoicesResponse(Invoice invoice) {
+        GetAllInvoicesResponse response = mapper.map(invoice, GetAllInvoicesResponse.class);
 
-    private double getTotalPrice(Invoice invoice) {
-        return invoice.getPrice() * invoice.getQuantity();
+        List<CartItemResponse> cartItemResponses = invoice.getCart().getCartItems()
+                .stream()
+                .map(cartItem -> mapper.map(cartItem, CartItemResponse.class))
+                .collect(Collectors.toList());
+
+        response.setCartItems(cartItemResponses);
+
+        return response;
     }
+    private GetInvoiceResponse mapToGetInvoiceResponse(Invoice invoice) {
+        GetInvoiceResponse response = mapper.map(invoice, GetInvoiceResponse.class);
+
+        List<CartItemResponse> cartItemResponses = invoice.getCart().getCartItems()
+                .stream()
+                .map(cartItem -> mapper.map(cartItem, CartItemResponse.class))
+                .collect(Collectors.toList());
+
+        response.setCartItems(cartItemResponses);
+
+        return response;
+    }
+   // private double getTotalPrice(Invoice invoice) {
+       // return invoice.getPrice() * invoice.getQuantity();
+//    }
 
 }
