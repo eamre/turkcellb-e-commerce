@@ -33,10 +33,6 @@ public class SalesController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CreateSaleResponse add(@RequestBody CreateSaleRequest request){
-        return saleService.add(request);
-    }
-    @PostMapping("/create")
     public CreateSaleResponseTwo createSale(@RequestBody CreateSaleRequestTwo request) {
         return saleService.createSale(request);
     }

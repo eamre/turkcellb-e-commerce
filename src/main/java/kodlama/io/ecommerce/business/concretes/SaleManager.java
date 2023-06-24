@@ -32,7 +32,6 @@ public class SaleManager implements SaleService {
     private final SaleBusinessRules rules;
     private final ModelMapper mapper;
     private final CartService cartService;
-    private final CartItemService cartItemService;
     @Override
     public List<GetAllSalesResponse> getAll() {
         List<Sale> sales = repository.findAll();
@@ -53,7 +52,6 @@ public class SaleManager implements SaleService {
         return response;
     }
 
-//
     @Override
     public CreateSaleResponseTwo createSale(CreateSaleRequestTwo request) {
 
@@ -80,8 +78,6 @@ public class SaleManager implements SaleService {
         CreateShippingRequest createShippingRequest = new CreateShippingRequest();
         createShipping(request,createShippingRequest,sale);
         shippingService.add(createShippingRequest);
-//        var updateCart = mapper.map(cart, UpdateCartRequest.class);
-//        cartService.update(cartId, updateCart);
 
         CreateSaleResponseTwo responseTwo = mapper.map(createdSale, CreateSaleResponseTwo.class);
 
@@ -92,7 +88,6 @@ public class SaleManager implements SaleService {
         rules.checkIfSaleExists(id);
         Sale sale = mapper.map(request,Sale.class);
         sale.setId(id);
-//        sale.setTotalPrice(getTotalPrice(sale));
 
         repository.save(sale);
 
@@ -106,16 +101,10 @@ public class SaleManager implements SaleService {
         repository.deleteById(id);
     }
 
-//    private double getTotalPrice(Sale sale) {
-//        return sale.getPrice() * sale.getQuantity();
-//    }
 
     private void createInvoice(CreateSaleRequestTwo request, Sale sale, CreateInvoiceRequest invoiceRequest) {
         invoiceRequest.setCartId(request.getCartId());
         invoiceRequest.setCardHolder(request.getPaymentRequest().getCardHolder());
-//        invoiceRequest.setQuantity(request.getQuantity());
-//        invoiceRequest.setPrice(request.getPrice());
-//        invoiceRequest.setProductName(product.getName());
         invoiceRequest.setTotalPrice(sale.getTotalPrice());
         invoiceRequest.setSaleDate(sale.getSaleDate());
     }
@@ -127,44 +116,3 @@ public class SaleManager implements SaleService {
     }
 
 }
-//    private double calculateTotalPrice(GetCartResponse cart) {
-//        List<CartItem> cartItems = cart.getCartItems();
-//        double totalPrice = 0.0;
-//
-//        for (CartItem cartItem : cartItems) {
-//            double itemPrice = cartItem.getPrice() * cartItem.getQuantity();
-//            totalPrice += itemPrice;
-//        }
-//
-//        return totalPrice;
-//    }
-//
-//    @Override
-//    public CreateSaleResponse add(CreateSaleRequest request) {
-//        GetProductResponse product = productService.getById(request.getProductId());
-//        rules.checkIsProductActiveOrInStock(product.isActive(),product.getQuantity(), request.getQuantity());
-//
-//        Sale sale = mapper.map(request,Sale.class);
-//        sale.setId(0);
-//        sale.setTotalPrice(getTotalPrice(sale));
-//        sale.setSaleDate(LocalDateTime.now());
-//
-//        CreateSalePaymentRequest salePaymentRequest = mapper.map(request.getPaymentRequest(), CreateSalePaymentRequest.class);
-//        salePaymentRequest.setPrice(sale.getTotalPrice());
-//        paymentService.processSalePayment(salePaymentRequest);
-//
-//        repository.save(sale);
-//
-//        productService.processSaleProduct(request);
-//
-//        CreateInvoiceRequest invoiceRequest = new CreateInvoiceRequest();
-//        createInvoice(request, product, sale, invoiceRequest);
-//        invoiceService.add(invoiceRequest);
-//
-//        CreateShippingRequest createShippingRequest = new CreateShippingRequest();
-//       // createShipping(request,createShippingRequest,sale);
-//        shippingService.add(createShippingRequest);
-//
-//        CreateSaleResponse response = mapper.map(sale,CreateSaleResponse.class);
-//        return response;
-//    }

@@ -14,5 +14,7 @@ public interface CartService {
     GetCartResponse getById(int id);
     CreateCartResponse add(CreateCartRequest request);
     UpdateCartResponse update(int id, UpdateCartRequest request);
+    void delete(int id);
+
     void deleteCartItem(int cartItemId);
 }

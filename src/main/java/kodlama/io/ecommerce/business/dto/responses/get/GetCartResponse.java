@@ -1,6 +1,6 @@
 package kodlama.io.ecommerce.business.dto.responses.get;
 
-import kodlama.io.ecommerce.entities.concretes.CartItem;
+import kodlama.io.ecommerce.common.dto.CartItemResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,8 +14,6 @@ import java.util.List;
 @NoArgsConstructor
 public class GetCartResponse {
     private int id;
-    private int productId;
-    private int quantity;
     private double totalPrice;
-    private List<CartItem> cartItems;
+    private List<CartItemResponse> cartItems;
 }

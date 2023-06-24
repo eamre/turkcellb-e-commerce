@@ -12,11 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class GetSaleResponse {
     private int id;
-    private int productId;
-    private String productName;
-    private double price;
-    private int quantity;
-    private double totalPrice; //readonly
+    private int cartId;
+    private double totalPrice;
     private LocalDateTime saleDate;
-
 }

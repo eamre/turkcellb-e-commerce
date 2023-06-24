@@ -17,10 +17,12 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+//    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "cart_id")
     private Cart cart;
 
+//    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;

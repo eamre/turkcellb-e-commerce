@@ -48,7 +48,6 @@ public class InvoiceManager implements InvoiceService {
     public CreateInvoiceResponse add(CreateInvoiceRequest request) {
         Invoice invoice = mapper.map(request, Invoice.class);
         invoice.setId(0);
-        //invoice.setTotalPrice(getTotalPrice(invoice));
         repository.save(invoice);
 
         CreateInvoiceResponse response = mapper.map(invoice,CreateInvoiceResponse.class);
@@ -60,7 +59,6 @@ public class InvoiceManager implements InvoiceService {
         rules.checkIfInvoiceExists(id);
         Invoice invoice = mapper.map(request,Invoice.class);
         invoice.setId(id);
-        //invoice.setTotalPrice(getTotalPrice(invoice));
 
         repository.save(invoice);
         UpdateInvoiceResponse response = mapper.map(invoice,UpdateInvoiceResponse.class);
@@ -97,8 +95,6 @@ public class InvoiceManager implements InvoiceService {
 
         return response;
     }
-   // private double getTotalPrice(Invoice invoice) {
-       // return invoice.getPrice() * invoice.getQuantity();
-//    }
+
 
 }

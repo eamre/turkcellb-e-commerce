@@ -20,7 +20,6 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,15 +34,9 @@ public class CartManager implements CartService {
     @Override
     public List<GetAllCartResponse> getAll() {
         List<Cart> carts = repository.findAll();
-        List<GetAllCartResponse> responses = new ArrayList<>();
-
-        for (Cart cart : carts) {
-            for (CartItem cartItem : cart.getCartItems()) {
-                GetAllCartResponse response = mapper.map(cartItem, GetAllCartResponse.class);
-                response.setCartId(cart.getId());
-                responses.add(response);
-            }
-        }
+        List<GetAllCartResponse> responses = carts.stream()
+                .map(cart -> mapper.map(cart, GetAllCartResponse.class))
+                .toList();
 
         return responses;
     }
@@ -74,7 +67,7 @@ public class CartManager implements CartService {
 
         cart.setTotalPrice(cart.getTotalPrice()+(request.getPrice() * request.getQuantity()));
 
-        Cart createdCart = repository.save(cart);
+        repository.save(cart);
         CreateCartResponse response = mapper.map(cartItemRequest, CreateCartResponse.class);
         return response;
     }
@@ -90,17 +83,19 @@ public class CartManager implements CartService {
     }
 
     @Override
+    public void delete(int id) {
+        repository.deleteById(id);
+    }
+
+    @Override
     public void deleteCartItem(int cartItemId) {
         CartItem cartItem = cartItemService.getById(cartItemId);
-        // Retrieve the cart from the cart item
         Cart cart = cartItem.getCart();
-        // Remove the cart item from the cart
         cart.getCartItems().remove(cartItem);
-        // Recalculate the total price
         recalculateTotalPrice(cart);
-        // Save the updated cart
         repository.save(cart);
     }
+
 
     private void recalculateTotalPrice(Cart cart) {
         double totalPrice = cart.getCartItems().stream()

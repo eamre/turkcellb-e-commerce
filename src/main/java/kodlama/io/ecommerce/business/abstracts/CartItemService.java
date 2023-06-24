@@ -6,5 +6,4 @@ import kodlama.io.ecommerce.entities.concretes.CartItem;
 public interface CartItemService {
     CartItem add(CreateCartItemRequest request);
     CartItem getById(int id);
-//    void delete(int cartItemId);
 }

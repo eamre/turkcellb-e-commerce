@@ -25,9 +25,4 @@ public class Sale {
     @OneToOne
     @JoinColumn(name = "cart_id")
     private Cart cart;
-//    @ManyToMany
-//    @JoinTable(name = "product_sale",
-//            joinColumns = @JoinColumn(name = "sale_id"),
-//            inverseJoinColumns = @JoinColumn(name = "product_id"))
-//    private Set<Product> products;
 }

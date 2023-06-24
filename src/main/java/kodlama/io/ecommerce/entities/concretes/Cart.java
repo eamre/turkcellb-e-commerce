@@ -23,7 +23,4 @@ public class Cart {
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
     private List<CartItem> cartItems;
-
-    @OneToOne(mappedBy = "cart")
-    private Invoice invoice;
 }

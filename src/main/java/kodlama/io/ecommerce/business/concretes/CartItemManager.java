@@ -38,17 +38,5 @@ public class CartItemManager implements CartItemService {
         return cartItem;
     }
 
-//    public void delete(int cartItemId) {
-//        CartItem cartItem = repository.findById(cartItemId).orElseThrow();
-//        Cart cart = cartItem.getCart();
-//        List<CartItem> cartItems = cart.getCartItems();
-//        cartItems.remove(cartItem);
-//
-//        double totalPrice = cartItems.stream()
-//                .mapToDouble(item -> item.getPrice() * item.getQuantity())
-//                .sum();
-//        cart.setTotalPrice(totalPrice);
-//
-//        cartService.calculateTotalPrice(cart.getId(),totalPrice);
-//    }
+
 }
