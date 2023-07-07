@@ -3,18 +3,20 @@ package kodlama.io.ecommerce.business.concretes;
 import kodlama.io.ecommerce.business.abstracts.CartItemService;
 import kodlama.io.ecommerce.business.abstracts.CartService;
 import kodlama.io.ecommerce.business.abstracts.ProductService;
+import kodlama.io.ecommerce.business.abstracts.UserService;
 import kodlama.io.ecommerce.business.dto.requests.create.CreateCartItemRequest;
 import kodlama.io.ecommerce.business.dto.requests.create.CreateCartRequest;
+import kodlama.io.ecommerce.business.dto.requests.update.UpdateCartItemRequest;
 import kodlama.io.ecommerce.business.dto.requests.update.UpdateCartRequest;
 import kodlama.io.ecommerce.business.dto.responses.create.CreateCartResponse;
 import kodlama.io.ecommerce.business.dto.responses.get.GetAllCartResponse;
 import kodlama.io.ecommerce.business.dto.responses.get.GetCartResponse;
-import kodlama.io.ecommerce.business.dto.responses.get.GetProductResponse;
 import kodlama.io.ecommerce.business.dto.responses.update.UpdateCartResponse;
 import kodlama.io.ecommerce.business.rules.CartBusinessRules;
 import kodlama.io.ecommerce.entities.concretes.Cart;
 import kodlama.io.ecommerce.entities.concretes.CartItem;
 import kodlama.io.ecommerce.entities.concretes.Product;
+import kodlama.io.ecommerce.entities.concretes.User;
 import kodlama.io.ecommerce.repository.abstracts.CartRepository;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -30,7 +32,7 @@ public class CartManager implements CartService {
     private final ProductService productService;
     private final CartItemService cartItemService;
     private final CartBusinessRules rules;
-
+    private final UserService userService;
     @Override
     public List<GetAllCartResponse> getAll() {
         List<Cart> carts = repository.findAll();
@@ -52,23 +54,23 @@ public class CartManager implements CartService {
     @Override
     public CreateCartResponse add(CreateCartRequest request) {
         Cart cart = repository.findById(request.getCartId()).orElseGet(() -> createNewCart());
-        GetProductResponse productResponse = productService.getById(request.getProductId());
-        Product product = mapper.map(productResponse, Product.class);
+        User user = mapper.map(userService.getById(request.getUserId()), User.class);
+        Product product = mapper.map(productService.getById(request.getProductId()), Product.class);
 
         rules.checkIsProductActiveOrInStock(product.isActive(), product.getQuantity(), request.getQuantity());
 
-        CreateCartItemRequest cartItemRequest = new CreateCartItemRequest();
-        cartItemRequest.setCart(cart);
-        cartItemRequest.setProduct(product);
-        cartItemRequest.setQuantity(request.getQuantity());
-        cartItemRequest.setPrice(request.getPrice());
+        CartItem cartItem = updateOrCreateCartItem(cart, product, request);
 
-        cartItemService.add(cartItemRequest);
+        double totalPrice = cart.getCartItems().stream()
+                .mapToDouble(item -> item.getPrice())
+                .sum();
+        cart.setTotalPrice(totalPrice);
 
-        cart.setTotalPrice(cart.getTotalPrice()+(request.getPrice() * request.getQuantity()));
+        cart.setUser(user);
 
         repository.save(cart);
-        CreateCartResponse response = mapper.map(cartItemRequest, CreateCartResponse.class);
+
+        CreateCartResponse response = mapper.map(cartItem, CreateCartResponse.class);
         return response;
     }
 
@@ -96,7 +98,33 @@ public class CartManager implements CartService {
         repository.save(cart);
     }
 
+    private CartItem updateOrCreateCartItem(Cart cart, Product product, CreateCartRequest request){
+        CartItem existingCartItem = cart.getCartItems().stream()
+                .filter(item -> item.getProduct().getId() == product.getId())
+                .findFirst()
+                .orElse(null);
 
+        if (existingCartItem != null) {
+            existingCartItem.setQuantity(existingCartItem.getQuantity() + request.getQuantity());
+            existingCartItem.setPrice(existingCartItem.getPrice() + (request.getPrice() * request.getQuantity()));
+
+            var updateCartItem = mapper.map(existingCartItem, UpdateCartItemRequest.class);
+            cartItemService.update(existingCartItem.getId(), updateCartItem);
+            return existingCartItem;
+
+        } else {
+            CreateCartItemRequest cartItemRequest = new CreateCartItemRequest();
+            cartItemRequest.setCart(cart);
+            cartItemRequest.setProduct(product);
+            cartItemRequest.setQuantity(request.getQuantity());
+            cartItemRequest.setPrice(request.getPrice() * request.getQuantity());
+
+            cartItemService.add(cartItemRequest);
+
+            return mapper.map(cartItemRequest, CartItem.class);
+
+        }
+    }
     private void recalculateTotalPrice(Cart cart) {
         double totalPrice = cart.getCartItems().stream()
                 .mapToDouble(item -> item.getPrice() * item.getQuantity())

@@ -58,7 +58,14 @@ public class ShippingManager implements ShippingService {
 
     @Override
     public UpdateShippingResponse update(int id, UpdateShippingRequest request) {
-        return null;
+        Shipping shipping = mapper.map(request, Shipping.class);
+
+        shipping.setId(id);
+
+        repository.save(shipping);
+
+        UpdateShippingResponse response = mapper.map(shipping, UpdateShippingResponse.class);
+        return response;
     }
 
     @Override

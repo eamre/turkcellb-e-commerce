@@ -9,11 +9,13 @@ import kodlama.io.ecommerce.business.dto.responses.create.CreateSaleResponseTwo;
 import kodlama.io.ecommerce.business.dto.responses.get.GetAllSalesResponse;
 import kodlama.io.ecommerce.business.dto.responses.get.GetCartResponse;
 import kodlama.io.ecommerce.business.dto.responses.get.GetSaleResponse;
+import kodlama.io.ecommerce.business.dto.responses.get.GetUserResponse;
 import kodlama.io.ecommerce.business.dto.responses.update.UpdateSaleResponse;
 import kodlama.io.ecommerce.business.rules.SaleBusinessRules;
 import kodlama.io.ecommerce.common.dto.CreateSalePaymentRequest;
 import kodlama.io.ecommerce.entities.concretes.Cart;
 import kodlama.io.ecommerce.entities.concretes.Sale;
+import kodlama.io.ecommerce.entities.concretes.User;
 import kodlama.io.ecommerce.repository.abstracts.SaleRepository;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -32,6 +34,8 @@ public class SaleManager implements SaleService {
     private final SaleBusinessRules rules;
     private final ModelMapper mapper;
     private final CartService cartService;
+    private final UserService userService;
+
     @Override
     public List<GetAllSalesResponse> getAll() {
         List<Sale> sales = repository.findAll();
@@ -56,9 +60,13 @@ public class SaleManager implements SaleService {
     public CreateSaleResponseTwo createSale(CreateSaleRequestTwo request) {
 
         GetCartResponse cartResponse = cartService.getById(request.getCartId());
+        GetUserResponse userResponse = userService.getById(request.getUserId());
+
         Cart cart = mapper.map(cartResponse, Cart.class);
+        User user = mapper.map(userResponse, User.class);
 
         Sale sale = new Sale();
+        sale.setUser(user);
         sale.setCart(cart);
         sale.setTotalPrice(cart.getTotalPrice());
         sale.setSaleDate(LocalDateTime.now());

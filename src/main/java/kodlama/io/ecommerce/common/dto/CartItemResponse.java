@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CartItemResponse {
     private int id;
+    private int productId;
     private String productName;
     private int quantity;
     private double price;

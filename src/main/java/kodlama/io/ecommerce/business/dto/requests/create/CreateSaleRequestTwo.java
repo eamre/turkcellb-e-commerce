@@ -12,6 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CreateSaleRequestTwo {
     private int cartId;
+    private int userId;
     private CreateShippingRequest shippingRequest;
     private PaymentRequest paymentRequest;
 }

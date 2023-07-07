@@ -25,4 +25,8 @@ public class Sale {
     @OneToOne
     @JoinColumn(name = "cart_id")
     private Cart cart;
+
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private User user;
 }

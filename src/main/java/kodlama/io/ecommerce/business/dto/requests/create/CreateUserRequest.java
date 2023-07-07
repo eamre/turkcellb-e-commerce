@@ -9,10 +9,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CreateCartRequest {
-    private int cartId;
-    private int userId;
-    private int productId;
-    private int quantity;
-    private double price;
+public class CreateUserRequest {
+    private String firstName;
+    private String lastName;
+    private String username;
+    private String email;
 }

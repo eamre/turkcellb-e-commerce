@@ -5,16 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @AllArgsConstructor
 @Getter
 @Setter
 @NoArgsConstructor
-public class CreateSaleResponseTwo {
+public class CreateUserResponse {
     private int id;
-    private int userId;
-    private int cartId;
-    private double totalPrice;
-    private LocalDateTime saleDate;
+    private String firstName;
+    private String lastName;
+    private String username;
+    private String email;
 }
